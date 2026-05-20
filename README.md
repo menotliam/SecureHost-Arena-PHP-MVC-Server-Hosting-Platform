@@ -134,24 +134,23 @@ Browser request
 
 Repository structure:
 
-```text
+```
 SecureHost-Arena-PHP-MVC-Server-Hosting-Platform/
-+-- app/
-|   +-- config/          # Environment loading and app configuration
-|   +-- controllers/     # Public, user, cart, product, post, and admin controllers
-|   +-- core/            # Router, base controller, database wrapper, secure upload helper
-|   +-- helpers/         # Session, pagination, and upload helpers
-|   +-- models/          # Database models for users, products, orders, tickets, content
-|   +-- views/           # Client and admin PHP views
-+-- public/
-|   +-- css/             # Client styles and visual assets
-|   +-- js/              # Client scripts
-|   +-- admin_assets/    # Admin dashboard CSS, JS, fonts, and images
-|   +-- uploads/         # Runtime upload directory
-|   +-- index.php        # Public entry point
-+-- database.sql         # Database schema and seed data
-+-- Spec_&_Reqs.md       # Original specification notes
-+-- README.md
+├── app/
+|   ├── config/          # Environment loading and app configuration
+|   ├── controllers/     # Public, user, cart, product, post, and admin controllers
+|   ├── core/            # Router, base controller, database wrapper, secure upload helper
+|   ├── helpers/         # Session, pagination, and upload helpers
+|   ├── models/          # Database models for users, products, orders, tickets, content
+|   ├── views/           # Client and admin PHP views
+├── public/
+|   ├── css/             # Client styles and visual assets
+|   ├── js/              # Client scripts
+|   ├── admin_assets/    # Admin dashboard CSS, JS, fonts, and images
+|   ├── uploads/         # Runtime upload directory
+|   ├── index.php        # Public entry point
+├── database.sql         # Database schema and seed data
+└── README.md
 ```
 
 ## Database Model
