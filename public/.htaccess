@@ -1,0 +1,31 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Production: force HTTPS (place BEFORE trailing-slash rule; uncomment when live)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # One canonical shape: drop trailing slash except real directories (aligns with router + client canonical).
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} ^(.+)/$
+    RewriteRule ^ %1 [R=301,L]
+
+    # SEO files (dynamic so Sitemap URL matches URLROOT in .env)
+    RewriteRule ^robots\.txt$ robots.php [L]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+    # Send non-file and non-directory requests to front controller.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>
+
+# Security headers (adjust CSP if you add new third-party scripts or embeds)
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()"
+    # Tailwind CDN, CKEditor, unpkg (AOS), cdnjs (GSAP, Prism, FA, Typed, Dropzone), jsDelivr (SweetAlert2, Swiper, medium-zoom), Google Fonts, Maps iframes
+    Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.ckeditor.com https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https: http:; connect-src 'self'; frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com;"
+</IfModule>

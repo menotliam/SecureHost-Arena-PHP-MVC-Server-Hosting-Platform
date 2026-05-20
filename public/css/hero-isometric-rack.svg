@@ -1,0 +1,74 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bg" x1="800" y1="0" x2="800" y2="900" gradientUnits="userSpaceOnUse">
+<stop stop-color="#040916"/>
+<stop offset="1" stop-color="#02050D"/>
+</linearGradient>
+<linearGradient id="rackTop" x1="0" y1="0" x2="1" y2="1">
+<stop stop-color="#164E63"/>
+<stop offset="1" stop-color="#1E1B4B"/>
+</linearGradient>
+<linearGradient id="rackSide" x1="0" y1="0" x2="1" y2="1">
+<stop stop-color="#0F172A"/>
+<stop offset="1" stop-color="#111827"/>
+</linearGradient>
+<linearGradient id="rackFront" x1="0" y1="0" x2="0" y2="1">
+<stop stop-color="#0B1120"/>
+<stop offset="1" stop-color="#020617"/>
+</linearGradient>
+<linearGradient id="neonLine" x1="0" y1="0" x2="1" y2="0">
+<stop stop-color="#22D3EE"/>
+<stop offset="1" stop-color="#A855F7"/>
+</linearGradient>
+<linearGradient id="voxel" x1="0" y1="0" x2="1" y2="1">
+<stop stop-color="#4F46E5"/>
+<stop offset="1" stop-color="#0891B2"/>
+</linearGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+<g opacity="0.45">
+<path d="M0 760L800 420L1600 760" stroke="#1E293B" stroke-width="1"/>
+<path d="M0 810L800 470L1600 810" stroke="#1E293B" stroke-width="1"/>
+<path d="M0 860L800 520L1600 860" stroke="#1E293B" stroke-width="1"/>
+<path d="M0 710L800 370L1600 710" stroke="#334155" stroke-width="1"/>
+<path d="M240 900L800 640L1360 900" stroke="#0EA5E9" stroke-opacity="0.25" stroke-width="1.2"/>
+</g>
+<g opacity="0.55">
+<path d="M500 280L700 190L900 280L700 370L500 280Z" fill="url(#rackTop)"/>
+<path d="M500 280V520L700 610V370L500 280Z" fill="url(#rackSide)"/>
+<path d="M900 280V520L700 610V370L900 280Z" fill="url(#rackFront)"/>
+<path d="M560 320L700 255L840 320L700 385L560 320Z" stroke="url(#neonLine)" stroke-opacity="0.55"/>
+<path d="M560 390L700 325L840 390L700 455L560 390Z" stroke="url(#neonLine)" stroke-opacity="0.55"/>
+<path d="M560 460L700 395L840 460L700 525L560 460Z" stroke="url(#neonLine)" stroke-opacity="0.55"/>
+</g>
+<g opacity="0.5">
+<path d="M990 350L1115 294L1240 350L1115 406L990 350Z" fill="url(#rackTop)"/>
+<path d="M990 350V500L1115 556V406L990 350Z" fill="url(#rackSide)"/>
+<path d="M1240 350V500L1115 556V406L1240 350Z" fill="url(#rackFront)"/>
+<path d="M1026 386L1115 346L1204 386L1115 426L1026 386Z" stroke="#22D3EE" stroke-opacity="0.5"/>
+<path d="M1026 438L1115 398L1204 438L1115 478L1026 438Z" stroke="#A855F7" stroke-opacity="0.42"/>
+</g>
+<g opacity="0.5">
+<path d="M322 356L438 304L554 356L438 408L322 356Z" fill="url(#rackTop)"/>
+<path d="M322 356V492L438 544V408L322 356Z" fill="url(#rackSide)"/>
+<path d="M554 356V492L438 544V408L554 356Z" fill="url(#rackFront)"/>
+<path d="M354 386L438 348L522 386L438 424L354 386Z" stroke="#22D3EE" stroke-opacity="0.45"/>
+<path d="M354 434L438 396L522 434L438 472L354 434Z" stroke="#A855F7" stroke-opacity="0.45"/>
+</g>
+<g opacity="0.64">
+<path d="M240 544L286 522L332 544L286 566L240 544Z" fill="url(#voxel)"/>
+<path d="M240 544V598L286 620V566L240 544Z" fill="#1E293B"/>
+<path d="M332 544V598L286 620V566L332 544Z" fill="#0F172A"/>
+
+<path d="M1280 548L1326 526L1372 548L1326 570L1280 548Z" fill="url(#voxel)"/>
+<path d="M1280 548V602L1326 624V570L1280 548Z" fill="#1E293B"/>
+<path d="M1372 548V602L1326 624V570L1372 548Z" fill="#0F172A"/>
+
+<path d="M380 632L426 610L472 632L426 654L380 632Z" fill="url(#voxel)"/>
+<path d="M1128 636L1174 614L1220 636L1174 658L1128 636Z" fill="url(#voxel)"/>
+</g>
+<g opacity="0.35">
+<circle cx="700" cy="258" r="110" fill="#22D3EE"/>
+<circle cx="700" cy="258" r="170" fill="#A855F7"/>
+</g>
+</svg>

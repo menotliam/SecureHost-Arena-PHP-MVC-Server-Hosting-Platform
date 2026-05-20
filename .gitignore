@@ -1,0 +1,16 @@
+.env
+
+# Runtime uploads and local generated assets
+public/uploads/
+public/media/
+storage/*.log
+
+# Local debug/scratch files
+public/debug-*.log
+public/debug-*.txt
+scratch.py
+process_sql.py
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,901 @@
+/* Custom styles for the client side */
+/* nav / header CSS lives in the inline <style> inside header.php */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.landing-scene {
+    position: relative;
+    background: #020817;
+    overflow: hidden;
+}
+
+/* landing scene */
+.landing-scene__image,
+.landing-scene__fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.landing-scene__image {
+    opacity: 0.2;
+    background-image: url("dark.svg"); /* hoặc file của bạn */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.landing-scene__fade {
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(2, 8, 23, 0.3) 55%,
+        #020817 100%
+    );
+}
+
+/* ── Hero scene ─────────────────────────────────────── */
+
+.hero-scene,
+#about-us{
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Hero card position variables (chỉnh tại đây) ───── */
+:root {
+    --card-w:         320px;   /* chiều rộng mỗi card          */
+    --card-w-r:      350px;
+    --card-left-top:  6rem;    /* khoảng cách từ trên, card trái */
+    --card-right-top: 17rem;    /* khoảng cách từ trên, card phải */
+    --card-left-x:    -95px;     /* dịch ngang card trái (+ = vào trong) */
+    --card-right-x:   -80px;     /* dịch ngang card phải (+ = vào trong) */
+}
+/* Tablet/desktop vừa: giữ flow bình thường để tránh chồng lấn khi zoom */
+@media (min-width: 1024px) and (max-width: 1399.98px) {
+  .hero-cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .hero-card-left,
+  .hero-card-right {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+  }
+}
+/* Chỉ màn rất rộng mới cho card bay 2 bên */
+@media (min-width: 1400px) {
+  .hero-cards-wrapper {
+        display: contents; 
+    }
+    .hero-card-left {
+        position: absolute;
+        left:  var(--card-left-x);
+        top:   var(--card-left-top);
+        width: var(--card-w);
+    }
+    .hero-card-right {
+        position: absolute;
+        right: var(--card-right-x);
+        top:   var(--card-right-top);
+        width: var(--card-w-r);
+    }
+}
+
+/* ── Floating cards ─────────────────────────────────── */
+.hero-floating-card {
+    border: 3px solid rgba(34, 211, 238, 0.35);
+    background: rgba(6, 14, 38, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 28px rgba(34, 211, 238, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    animation: floatCard 2s ease-in-out infinite;
+}
+
+.hero-floating-card--delayed {
+    animation-delay: 1s;
+    border-color: rgba(139, 92, 246, 0.35);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 28px rgba(139, 92, 246, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* ── Homepage product preview deck (grid → swipe) ─────── */
+
+.home-product-deck {
+    display: flex;
+    align-items: stretch;
+    gap: 1.15rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.35rem 0.25rem 0.65rem;
+    scrollbar-width: thin;
+}
+
+.home-product-deck__empty {
+    flex: 1 0 100%;
+    width: 100%;
+    scroll-snap-align: none;
+}
+
+@media (min-width: 1024px) {
+    .home-product-deck {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: stretch;
+        overflow: visible;
+        scroll-snap-type: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* ── Product preview cards (rarity / tilt / glow) ─────── */
+
+.home-product-card {
+    --pointer-x: 50%;
+    --pointer-y: 42%;
+    --rarity-glow1: rgba(148, 163, 184, 0.35);
+    --rarity-glow2: rgba(100, 116, 139, 0.12);
+    --rarity-accent: #94a3b8;
+    --rarity-border1: #64748b;
+    --rarity-border2: #475569;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    flex: 0 0 min(86vw, 19.5rem);
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    border-radius: 1rem;
+    padding: 0;
+    isolation: isolate;
+    perspective: 900px;
+    transform-style: preserve-3d;
+}
+
+@media (min-width: 1024px) {
+    .home-product-card {
+        flex: unset;
+        width: auto;
+        scroll-snap-align: unset;
+    }
+}
+
+.home-product-card--rarity-common {
+    --rarity-glow1: rgba(148, 163, 184, 0.45);
+    --rarity-glow2: rgba(71, 85, 105, 0.2);
+    --rarity-accent: #cbd5e1;
+    --rarity-border1: #64748b;
+    --rarity-border2: #475569;
+}
+
+.home-product-card--rarity-rare {
+    --rarity-glow1: rgba(56, 189, 248, 0.5);
+    --rarity-glow2: rgba(14, 165, 233, 0.18);
+    --rarity-accent: #38bdf8;
+    --rarity-border1: #0ea5e9;
+    --rarity-border2: #0369a1;
+}
+
+.home-product-card--rarity-epic {
+    --rarity-glow1: rgba(167, 139, 250, 0.55);
+    --rarity-glow2: rgba(124, 58, 237, 0.22);
+    --rarity-accent: #c4b5fd;
+    --rarity-border1: #a78bfa;
+    --rarity-border2: #6d28d9;
+}
+
+.home-product-card--rarity-legendary {
+    --rarity-glow1: rgba(251, 191, 36, 0.6);
+    --rarity-glow2: rgba(245, 158, 11, 0.28);
+    --rarity-accent: #fcd34d;
+    --rarity-border1: #fbbf24;
+    --rarity-border2: #d97706;
+}
+
+.home-product-card__aura {
+    position: absolute;
+    inset: -6px;
+    border-radius: 1.1rem;
+    background: radial-gradient(
+        ellipse 85% 70% at 50% 0%,
+        var(--rarity-glow1),
+        transparent 68%
+    );
+    opacity: 0.55;
+    z-index: 0;
+    pointer-events: none;
+    animation: home-product-aura-pulse 3.2s ease-in-out infinite;
+}
+
+.home-product-card--rarity-legendary .home-product-card__aura {
+    animation-duration: 2.4s;
+}
+
+@keyframes home-product-aura-pulse {
+    0%,
+    100% {
+        opacity: 0.42;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.72;
+        transform: scale(1.02);
+    }
+}
+
+/* Vệt glow mảnh chỉ trên viền (mask content-box + xor) */
+.home-product-card__spin {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    box-sizing: border-box;
+    border-radius: inherit;
+    pointer-events: none;
+    transform-origin: 50% 50%;
+    padding: 2px;
+    opacity: 0.75;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 248deg,
+        rgba(255, 255, 255, 0.06) 266deg,
+        var(--rarity-accent) 282deg,
+        rgba(255, 255, 255, 0.1) 294deg,
+        transparent 304deg,
+        transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: home-product-border-spin 16s linear infinite;
+}
+
+.home-product-card--rarity-legendary .home-product-card__spin {
+    animation-duration: 11s;
+    opacity: 0.88;
+}
+
+@keyframes home-product-border-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.home-product-card__inner {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: 1rem;
+    background: linear-gradient(
+        165deg,
+        rgba(15, 23, 42, 0.97) 0%,
+        rgba(2, 6, 23, 0.98) 100%
+    );
+    overflow: hidden;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.home-product-card__noise {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    opacity: 0.48;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 72px 72px;
+    background-repeat: repeat;
+    background-position: 0 0;
+    animation: home-product-noise-shift 0.55s steps(3) infinite;
+}
+
+@keyframes home-product-noise-shift {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(-1.5%, 1%);
+    }
+    50% {
+        transform: translate(1%, -1%);
+    }
+    75% {
+        transform: translate(-0.8%, -0.6%);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.home-product-card__glowspot {
+    position: absolute;
+    z-index: 1;
+    width: 140%;
+    height: 140%;
+    left: var(--pointer-x);
+    top: var(--pointer-y);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: radial-gradient(
+        circle at center,
+        var(--rarity-glow2) 0%,
+        transparent 52%
+    );
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+}
+
+.home-product-card__surface {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: inherit;
+    padding: 1.15rem 1.2rem 1.15rem;
+    transform: translateZ(0);
+    transition: transform 0.14s ease-out;
+    will-change: transform;
+}
+
+/* Giá / specs / Launch: một khối đẩy xuống đáy khi các card cùng hàng có chiều cao khác nhau */
+.home-product-card__lower {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: auto;
+    flex-shrink: 0;
+    min-height: 0;
+}
+
+@media (min-width: 1024px) {
+    .home-product-card__surface {
+        min-height: 22rem;
+    }
+}
+
+.home-product-card__foot-spacer {
+    flex: 0 0 auto;
+    min-height: 0.85rem;
+}
+.home-product-card__mid-spacer {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* Mobile + tablet (deck ngang): đồng chiều cao, chừa khoảng trước nút; tablet thu chữ */
+@media (max-width: 1023.98px) {
+    .home-product-card__surface {
+        padding: 1rem 0.85rem 1rem;
+    }
+
+    .home-product-card__title {
+        margin-top: 0.65rem;
+        font-size: clamp(0.8125rem, 3.6vw, 1rem);
+        line-height: 1.2;
+    }
+
+    .home-product-card__desc {
+        margin-top: 0.35rem;
+        font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    }
+
+    .home-product-card__price {
+        font-size: clamp(0.95rem, 4.2vw, 1.25rem);
+        line-height: 1.15;
+    }
+
+    .home-product-card__price-suffix {
+        font-size: clamp(0.62rem, 2.3vw, 0.75rem);
+    }
+
+    .home-product-card__specs {
+        margin-top: 0.45rem;
+        padding-top: 0.45rem;
+        gap: 0.2rem;
+        font-size: clamp(0.6rem, 2.35vw, 0.75rem);
+    }
+
+    .home-product-card__specs span {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+    .home-product-card {
+        flex: 0 0 clamp(10.25rem, 36vw, 14.25rem);
+    }
+
+    .home-product-card__foot-spacer {
+        min-height: 1.05rem;
+    }
+
+    .home-product-card__title {
+        font-size: clamp(0.78rem, 2.1vw, 0.9rem);
+    }
+
+    .home-product-card__desc {
+        font-size: clamp(0.62rem, 1.45vw, 0.7rem);
+    }
+
+    .home-product-card__price {
+        font-size: clamp(0.88rem, 2.6vw, 1.1rem);
+    }
+
+    .home-product-card__specs {
+        font-size: clamp(0.58rem, 1.35vw, 0.68rem);
+    }
+}
+
+.home-product-card__rarity {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--rarity-accent);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: rgba(15, 23, 42, 0.88);
+    box-shadow: 0 0 18px var(--rarity-glow2);
+}
+
+.home-product-card--rarity-common .home-product-card__rarity {
+    border-color: rgba(148, 163, 184, 0.45);
+    background: rgba(30, 41, 59, 0.9);
+}
+
+.home-product-card--rarity-rare .home-product-card__rarity {
+    border-color: rgba(56, 189, 248, 0.5);
+    background: rgba(8, 47, 73, 0.82);
+}
+
+.home-product-card--rarity-epic .home-product-card__rarity {
+    border-color: rgba(167, 139, 250, 0.55);
+    background: rgba(46, 16, 101, 0.55);
+}
+
+.home-product-card--rarity-legendary .home-product-card__rarity {
+    border-color: rgba(251, 191, 36, 0.55);
+    background: rgba(69, 26, 3, 0.45);
+}
+
+.home-product-card__ping {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.home-product-card__online {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+    animation: home-product-online-pulse 1.6s ease-out infinite;
+}
+
+@keyframes home-product-online-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+.home-product-card__bandwidth {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+    color: #cbd5e1;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.home-product-card__bandwidth-label {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.home-product-card__bandwidth-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: var(--rarity-accent);
+}
+
+/* Desktop fine pointer: băng thông trong card ẩn — hiện tooltip ngoài (JS) */
+@media (hover: hover) and (pointer: fine) {
+    .home-product-card__bandwidth--static {
+        display: none !important;
+    }
+}
+
+/* Tooltip băng thông (cùng pattern revenue-point-tooltip admin) */
+.home-product-bandwidth-pop {
+    position: fixed;
+    z-index: 90;
+    left: 0;
+    top: 0;
+    min-width: 138px;
+    max-width: 240px;
+    padding: 0.45rem 0.65rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(100, 116, 139, 0.45);
+    background: rgba(15, 23, 42, 0.96);
+    color: #e2e8f0;
+    box-shadow: 0 10px 30px rgba(2, 8, 23, 0.55);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.14s ease, transform 0.14s ease;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    --bw-pop-accent: #22d3ee;
+}
+
+.home-product-bandwidth-pop.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.home-product-bandwidth-pop strong {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 0.15rem;
+}
+
+.home-product-bandwidth-pop span {
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--bw-pop-accent);
+}
+
+.home-product-card:hover .home-product-card__glowspot {
+    opacity: 1;
+}
+
+.home-product-card:hover .home-product-card__inner {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+        0 0 28px var(--rarity-glow2),
+        0 16px 44px rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-product-card__spin,
+    .home-product-card__aura,
+    .home-product-card__noise,
+    .home-product-card__online {
+        animation: none !important;
+    }
+
+    .home-product-card__noise {
+        opacity: 0.22;
+    }
+
+    .home-product-card__online {
+        box-shadow: none;
+    }
+
+    .home-product-card__surface {
+        transition: none;
+    }
+
+    .home-product-bandwidth-pop {
+        transition: none;
+    }
+}
+
+/* "Chi tiết" button (homepage product cards) */
+.product-detail-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(234, 201, 13, 0.807);
+    background: rgba(15, 23, 42, 0.9);
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: border-color 0.22s ease-in-out, box-shadow 0.22s ease-in-out, background-color 0.22s ease-in-out;
+}
+
+.home-product-card .product-detail-btn {
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.product-detail-btn:hover {
+    border-color: rgba(34, 211, 238, 0.5);
+    color: #f8fafc;
+}
+
+/* ── Custom select (dark client theme) ─────────────── */
+.admin-custom-select {
+    position: relative;
+    width: 100%;
+}
+.admin-custom-select-native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.site-client-body .admin-custom-select-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0.875rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(55 65 81);
+    background: #111827;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.site-client-body .admin-custom-select-toggle:focus {
+    outline: none;
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+}
+.site-client-body .admin-custom-select-toggle i {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+}
+.site-client-body .admin-custom-select-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+.admin-custom-select-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.site-client-body .admin-custom-select-menu {
+    display: none;
+    flex-direction: column;
+    gap: 0.15rem;
+    background: #111827;
+    border: 1px solid rgb(55 65 81);
+    border-radius: 0.75rem;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.55);
+    padding: 0.35rem;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.site-client-body .admin-custom-select-menu.show {
+    display: flex;
+}
+.site-client-body .admin-custom-select-option {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    border: 0;
+    color: #cbd5e1;
+    background: transparent;
+    border-radius: 0.45rem;
+    font-size: 0.875rem;
+    padding: 0.45rem 0.6rem;
+    transition: background-color 0.14s ease, color 0.14s ease;
+}
+.site-client-body .admin-custom-select-option:hover,
+.site-client-body .admin-custom-select-option:focus {
+    background: rgba(34, 211, 238, 0.1);
+    color: #22d3ee;
+    outline: none;
+}
+.site-client-body .admin-custom-select-option.active {
+    background: rgba(34, 211, 238, 0.15);
+    color: #22d3ee;
+}
+
+/* ── Utilities ──────────────────────────────────────── */
+.line-clamp-2 {
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+#about-us {
+    scroll-margin-top: 88px;
+}
+
+/* ── Keyframes ──────────────────────────────────────── */
+@keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+}
+
+/* ── Header brand (client) ───────────────────────────── */
+@keyframes brand-sitename-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.site-header-brand:hover .brand-sitename {
+    animation: brand-sitename-spin 1.1s linear infinite;
+}
+
+.site-brand-logo-glow.hvr-glow:hover,
+.site-brand-logo-fallback.hvr-glow:hover {
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.55), 0 0 1px rgba(0, 0, 0, 0);
+}
+
+/* ── Hero typewriter + about brand shimmer ──────────── */
+/* Dùng inline flow (không flex-wrap + justify-center) để con trỏ luôn dính đuôi chữ, không tách dòng giữa */
+.hero-gradient-type-line {
+    display: inline-block;
+    max-width: 100%;
+    text-align: center;
+    vertical-align: top;
+}
+
+.hero-gradient-type-line #hero-typewriter {
+    display: inline;
+}
+
+.hero-type-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.85em;
+    margin-left: 2px;
+    vertical-align: -0.06em;
+    border-radius: 1px;
+    background: linear-gradient(180deg, #22d3ee, #a855f7);
+    animation: hero-type-cursor-blink 0.9s step-end infinite;
+}
+
+@keyframes hero-type-cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-type-cursor {
+        animation: none;
+        opacity: 0.85;
+    }
+    .site-header-brand:hover .brand-sitename {
+        animation: none;
+    }
+}
+
+@keyframes about-brand-gradient-shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+.about-brand-shimmer {
+    display: inline-block;
+    background: linear-gradient(90deg, #22d3ee, #a855f7, #ec4899, #22d3ee);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: about-brand-gradient-shift 3.2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-brand-shimmer {
+        animation: none;
+        background-position: 0% 50%;
+    }
+}
+
+/* About feature cards: pulse-grow on icon when card hovered (uses keyframes from hover-min.css) */
+.about-feature-card:hover .about-feature-icon {
+    animation: hvr-icon-pulse-grow 0.3s linear infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-feature-card:hover .about-feature-icon {
+        animation: none;
+    }
+}
+
+/* ── Hover.css theme overrides (load after hover-min.css) ───────── */
+
+.cta-register-ripple.hvr-ripple-in {
+    border-radius: 9999px;
+}
+
+.cta-register-ripple.hvr-ripple-in::before {
+    border-radius: 9999px;
+    border-color: rgba(34, 211, 238, 0.65);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
+}
+
+.cta-register-ripple.hvr-ripple-in:active::before,
+.cta-register-ripple.hvr-ripple-in:focus::before,
+.cta-register-ripple.hvr-ripple-in:hover::before {
+    border-color: rgba(34, 211, 238, 0.85);
+}
+
+/* “Tìm hiểu thêm”: ripple out + theme cyan (đồng bộ CTA) */
+.hero-cta-ripple-out.hvr-ripple-out {
+    border-radius: 0.75rem;
+}
+
+.hero-cta-ripple-out.hvr-ripple-out::before {
+    border-radius: 0.75rem;
+    border-color: transparent;
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+}
+
+.hero-cta-ripple-out.hvr-ripple-out:active::before,
+.hero-cta-ripple-out.hvr-ripple-out:focus::before,
+.hero-cta-ripple-out.hvr-ripple-out:hover::before {
+    border-color: rgba(34, 211, 238, 0.75);
+}
