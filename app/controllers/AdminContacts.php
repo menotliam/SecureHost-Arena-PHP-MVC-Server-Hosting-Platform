@@ -241,6 +241,13 @@ class AdminContacts extends Controller {
             if ($this->contactModel->updateStatus($ticketUserId, $ticketContactId, 'read')) {
                 $selectedContact->status = 'read';
                 $statusUpdated = true;
+                $this->logAudit('ticket_status_changed', 'ticket', $ticketContactId, [
+                    'ticket_user_id' => $ticketUserId,
+                    'subject'        => (string) ($selectedContact->subject ?? ''),
+                    'old_status'     => 'unread',
+                    'new_status'     => 'read',
+                    'source'         => 'admin_open_detail'
+                ]);
             }
         }
 
@@ -285,7 +292,18 @@ class AdminContacts extends Controller {
             exit();
         }
 
+        $oldStatus = (string) ($contact->status ?? '');
         $updated = $this->contactModel->updateStatus((int) $userId, (int) $contactId, $status);
+        if ($updated && $oldStatus !== $status) {
+            $this->logAudit('ticket_status_changed', 'ticket', (int) $contactId, [
+                'ticket_user_id' => (int) $userId,
+                'subject'        => (string) ($contact->subject ?? ''),
+                'old_status'     => $oldStatus,
+                'new_status'     => $status,
+                'source'         => 'admin_status_select'
+            ]);
+        }
+
         if ($this->isAjaxRequest()) {
             $this->respondJson([
                 'success' => (bool) $updated,
@@ -371,6 +389,13 @@ class AdminContacts extends Controller {
         }
 
         $saved = $this->contactModel->replyToContact((int) $userId, (int) $contactId, $replyMessage);
+        if ($saved) {
+            $this->logAudit('ticket_replied', 'ticket', (int) $contactId, [
+                'ticket_user_id' => (int) $userId,
+                'subject'        => (string) ($contact->subject ?? ''),
+                'reply_preview'  => mb_substr($replyMessage, 0, 100)
+            ]);
+        }
         $this->setFlash($saved ? 'success' : 'danger', $saved ? 'Đã lưu phản hồi và cập nhật trạng thái.' : 'Không thể lưu phản hồi.');
 
         header('Location: ' . $this->getRedirectUrl());
@@ -389,7 +414,14 @@ class AdminContacts extends Controller {
             exit();
         }
 
+        $contact = $this->contactModel->getContactByKey((int) $userId, (int) $contactId);
         $deleted = $this->contactModel->deleteContact((int) $userId, (int) $contactId);
+        if ($deleted) {
+            $this->logAudit('ticket_deleted', 'ticket', (int) $contactId, [
+                'ticket_user_id' => (int) $userId,
+                'subject'        => (string) ($contact->subject ?? '')
+            ]);
+        }
         $this->setFlash($deleted ? 'success' : 'danger', $deleted ? 'Đã xóa ticket liên hệ.' : 'Không thể xóa ticket.');
 
         header('Location: ' . $this->getRedirectUrl(true));

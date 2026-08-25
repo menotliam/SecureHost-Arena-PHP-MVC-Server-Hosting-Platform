@@ -47,9 +47,23 @@ class Users extends Controller {
                 return;
             }
 
-            // Rate limiting sau lần đăng nhập sai gần nhất
-            if ((time() - (int) ($_SESSION['login_last_submit'] ?? 0)) < 10) {
-                $data['login_err'] = 'Bạn vừa thử đăng nhập. Vui lòng đợi ít nhất 10 giây trước khi thử lại.';
+            // Database-backed Failed Login Tracking (Chống Brute-force theo IP & Username)
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $auditModel = $this->model('AuditLog');
+            $failedCount = $auditModel->countRecentFailures($username, $ip, 10);
+            if ($failedCount >= 5) {
+                $latestFailure = $auditModel->getLatestFailureTime($username, $ip, 10);
+                $passedSeconds = $latestFailure ? max(0, time() - strtotime($latestFailure)) : 0;
+                $remainingSeconds = max(1, min(600, 600 - $passedSeconds));
+                $remainingMinutes = (int) ceil($remainingSeconds / 60);
+
+                $this->logAudit('login_blocked_lockout', 'user', null, [
+                    'username'            => $username,
+                    'failed_attempts'     => $failedCount,
+                    'retry_after_seconds' => $remainingSeconds
+                ]);
+
+                $data['login_err'] = "Bạn đã đăng nhập sai {$failedCount} lần liên tiếp. Vui lòng thử lại sau {$remainingMinutes} phút.";
                 $this->view('client/users/login', $data);
                 return;
             }
@@ -66,6 +80,10 @@ class Users extends Controller {
 
                 if ($loggedInUser) {
                     if ($loggedInUser->status === 'banned') {
+                        $this->logAudit('login_blocked_banned', 'user', (int) $loggedInUser->id, [
+                            'username' => $username,
+                            'reason'   => 'account_banned'
+                        ]);
                         $data['login_err'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ.';
                         $this->view('client/users/login', $data);
                         return;
@@ -77,6 +95,12 @@ class Users extends Controller {
                     $_SESSION['user_role'] = $loggedInUser->role;
                     $_SESSION['user_avatar'] = $loggedInUser->avatar ?? '';
                     session_regenerate_id(true);
+
+                    $this->logAudit('login_success', 'user', (int) $loggedInUser->id, [
+                        'username' => $loggedInUser->username,
+                        'role'     => $loggedInUser->role
+                    ], (int) $loggedInUser->id);
+
                     // If "remember me" checked, extend the session cookie lifetime so browser keeps the session
                     if (!empty($_POST['remember-me'])) {
                         $cookieParams = session_get_cookie_params();
@@ -90,7 +114,6 @@ class Users extends Controller {
                                 'httponly' => true,
                                 'samesite' => $cookieParams['samesite'] ?? 'Lax'
                             ]);
-                            // small non-sensitive flag for client-side UI if needed
                             setcookie('remember_me', '1', [
                                 'expires' => $expire,
                                 'path' => $cookieParams['path'] ?? '/',
@@ -100,7 +123,6 @@ class Users extends Controller {
                                 'samesite' => $cookieParams['samesite'] ?? 'Lax'
                             ]);
                         } else {
-                            // PHP < 7.3 fallback (keeps SameSite=Lax via path hack as init.php does)
                             setcookie(session_name(), session_id(), $expire, $cookieParams['path'] . '; SameSite=Lax', $cookieParams['domain'] ?? '', $cookieParams['secure'] ?? false, true);
                             setcookie('remember_me', '1', $expire, $cookieParams['path'] . '; SameSite=Lax', $cookieParams['domain'] ?? '', $cookieParams['secure'] ?? false, false);
                         }
@@ -114,6 +136,10 @@ class Users extends Controller {
                     }
                     exit();
                 } else {
+                    $this->logAudit('login_failed', 'user', null, [
+                        'username' => $username,
+                        'reason'   => 'invalid_credentials'
+                    ]);
                     $data['login_err'] = 'Tên đăng nhập hoặc mật khẩu không đúng.';
                     $_SESSION['login_last_submit'] = time();
                 }
@@ -269,6 +295,12 @@ class Users extends Controller {
 
     // GET /users/logout
     public function logout() {
+        if (isset($_SESSION['user_id'])) {
+            $this->logAudit('logout', 'user', (int) $_SESSION['user_id'], [
+                'username' => (string) ($_SESSION['user_name'] ?? '')
+            ], (int) $_SESSION['user_id']);
+        }
+
         // Clear session variables
         $_SESSION = [];
 
@@ -382,6 +414,12 @@ class Users extends Controller {
                 if ($errors['full_name'] === '' && $errors['email'] === '') {
                     $updated = $this->userModel->updateProfile((int) $_SESSION['user_id'], $fullName, $email);
                     if ($updated) {
+                        $this->logAudit('profile_updated', 'user', (int) $_SESSION['user_id'], [
+                            'old_name'  => (string) ($currentUser->full_name ?? ''),
+                            'new_name'  => $fullName,
+                            'old_email' => (string) ($currentUser->email ?? ''),
+                            'new_email' => $email
+                        ]);
                         $_SESSION['user_name']      = $fullName;
                         $_SESSION['csrf_profile']   = bin2hex(random_bytes(32));
                         $_SESSION['profile_success'] = 'Đã cập nhật thông tin cá nhân.';
@@ -412,6 +450,9 @@ class Users extends Controller {
                 if ($errors['current_password'] === '' && $errors['new_password'] === '' && $errors['confirm_password'] === '') {
                     $updated = $this->userModel->updatePassword((int) $_SESSION['user_id'], password_hash($newPassword, PASSWORD_DEFAULT));
                     if ($updated) {
+                        $this->logAudit('password_changed', 'user', (int) $_SESSION['user_id'], [
+                            'action' => 'self_password_change'
+                        ]);
                         $_SESSION['csrf_profile']    = bin2hex(random_bytes(32));
                         $_SESSION['profile_success'] = 'Đã cập nhật mật khẩu.';
                         header('Location: ' . URLROOT . '/users/profile');
@@ -447,6 +488,9 @@ class Users extends Controller {
 
                         $avatarRelativeUrl = '/uploads/avatars/' . $stored['filename'];
                         $this->userModel->updateAvatar((int) $_SESSION['user_id'], $avatarRelativeUrl);
+                        $this->logAudit('avatar_updated', 'user', (int) $_SESSION['user_id'], [
+                            'avatar' => $avatarRelativeUrl
+                        ]);
                         $_SESSION['user_avatar']      = $avatarRelativeUrl;
                         $_SESSION['csrf_profile']     = bin2hex(random_bytes(32));
                         $_SESSION['profile_success'] = 'Đã cập nhật ảnh đại diện.';

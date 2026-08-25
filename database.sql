@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS faq_categories;
 DROP TABLE IF EXISTS faq_messages;
 DROP TABLE IF EXISTS faqs;
 DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS audit_logs;
 DROP TABLE IF EXISTS admin_notifications;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
@@ -43,6 +44,22 @@ CREATE TABLE users (
     reset_token VARCHAR(255) NULL,
     role ENUM('admin', 'member') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    actor_user_id INT NULL,
+    event_type VARCHAR(50) NOT NULL,
+    target_type VARCHAR(50) NULL,
+    target_id INT NULL,
+    ip_address VARCHAR(50) NOT NULL,
+    metadata LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    KEY idx_audit_logs_event_type (event_type),
+    KEY idx_audit_logs_created_at (created_at),
+    KEY idx_audit_logs_ip (ip_address),
+    KEY idx_audit_logs_actor (actor_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE admin_notifications (
@@ -341,6 +358,11 @@ INSERT INTO users (id, username, password, email, full_name, avatar, status, cre
 (2, 'demo_user', '$2a$10$FzCzQEFC6c35QeSkXecGQu2jiv/aoN3aMqAxrf.JA.RcgMhGErNTS', 'demo.user@securehost-arena.local', 'Demo Customer', NULL, 'active', 300, NULL, 'member', '2026-05-01 09:15:00'),
 (3, 'suspended_user', '$2a$10$HTWpQlRxqwVfJ7CtsSCMKugb9gADFkdSvYxZc7mnBrE.nMZRXJo82', 'suspended.user@securehost-arena.local', 'Suspended Demo User', NULL, 'banned', 0, NULL, 'member', '2026-05-01 09:30:00'),
 (4, 'guest_contact', '$2b$10$3VoMsFPBiuOD.BosjS9fheeQSb7qPOhERWTd5ciYJsjjY22w7LT3.', 'guest@securehost-arena.local', 'Guest Contact', NULL, 'active', 0, NULL, 'member', '2026-05-01 09:45:00');
+
+INSERT INTO audit_logs (id, actor_user_id, event_type, target_type, target_id, ip_address, metadata, created_at) VALUES
+(1, 1, 'login_success', 'user', 1, '127.0.0.1', '{"username":"admin","role":"admin"}', '2026-05-01 09:00:00'),
+(2, 2, 'login_success', 'user', 2, '192.0.2.10', '{"username":"demo_user","role":"member"}', '2026-05-01 09:15:00'),
+(3, NULL, 'login_failed', 'user', NULL, '192.0.2.99', '{"username":"unknown_user","reason":"invalid_credentials"}', '2026-05-01 09:20:00');
 
 INSERT INTO categories (id, name, slug, description) VALUES
 (1, 'Game Server Hosting', 'game-server-hosting', 'Managed server plans for multiplayer game communities.'),

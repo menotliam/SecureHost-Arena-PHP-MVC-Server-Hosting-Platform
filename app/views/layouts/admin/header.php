@@ -61,6 +61,8 @@ $adminFaviconMime = $useBrandingFavicon ? ($faviconMimeTypes[$faviconExt] ?? 'im
         $activeSection = 'faqs';
     } elseif (strpos($currentUrl, 'admin/users') === 0) {
         $activeSection = 'users';
+    } elseif (strpos($currentUrl, 'admin/auditlogs') === 0 || strpos($currentUrl, 'adminauditlogs') === 0) {
+        $activeSection = 'auditlogs';
     } elseif (strpos($currentUrl, 'admin/settings') === 0) {
         $activeSection = 'settings';
         $parts = explode('/', $currentUrl);
@@ -146,6 +148,10 @@ $adminFaviconMime = $useBrandingFavicon ? ($faviconMimeTypes[$faviconExt] ?? 'im
                     <i class="ti-user"></i>
                     <span class="admin-link-text">Người dùng</span>
                     <span class="admin-nav-badge admin-nav-badge-success"><?php echo $usersBadge; ?></span>
+                </a>
+                <a class="admin-nav-link <?php echo $activeSection === 'auditlogs' ? 'active' : ''; ?>" href="<?php echo URLROOT; ?>/admin/auditlogs">
+                    <i class="ti-shield"></i>
+                    <span class="admin-link-text">Audit Logs</span>
                 </a>
                 <div class="admin-nav-heading">Quản lý giao diện</div>
                 <a class="admin-nav-link <?php echo $activeSection === 'settings' && $settingsNav === 'homepage' ? 'active' : ''; ?>" href="<?php echo URLROOT; ?>/admin/settings/homepage">

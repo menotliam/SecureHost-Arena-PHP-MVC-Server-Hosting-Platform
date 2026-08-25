@@ -17,7 +17,7 @@ class Products extends Controller {
 
         $isAjaxSearch = isset($_GET['ajax_search']) && $_GET['ajax_search'] == '1';
         $isAjaxPage = isset($_GET['ajax_page']) && $_GET['ajax_page'] == '1';
-
+        if ($keyword !== '') { app_log('info', 'product_search', ['keyword' => $keyword, 'category_id' => $categoryId]); }
         $products = $this->productModel->getProducts($limit, $offset, $keyword, false, $categoryId, $minPrice, $maxPrice);
         
         // Nếu là yêu cầu Live Search (trả về JSON)

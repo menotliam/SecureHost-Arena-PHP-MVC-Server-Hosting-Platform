@@ -57,7 +57,17 @@ class Database {
     }
 
     public function execute() {
-        return $this->stmt->execute();
+        try {
+            $ok = $this->stmt->execute();
+            #app_log('info', 'db_query_executed', ['sql' => $this->stmt->queryString]);
+            return $ok;
+        } catch (PDOException $e) {
+            app_log('error', 'db_query_failed', [
+                'sql'   => $this->stmt->queryString,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;   
+        }
     }
 
     public function resultSet() {

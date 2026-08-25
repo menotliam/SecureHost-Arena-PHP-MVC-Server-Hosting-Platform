@@ -167,6 +167,7 @@ Important tables include:
 - `news`, `news_categories`, `reviews`, `news_views`, `news_likes` - content and engagement features
 - `settings` - public branding and configurable site content
 - `admin_notifications` - admin-facing operational notification data
+- `audit_logs` - security audit trail, failed login tracking, and admin operational logs
 
 ## Local Setup
 

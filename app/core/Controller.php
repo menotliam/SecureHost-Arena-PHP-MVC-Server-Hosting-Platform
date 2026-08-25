@@ -26,6 +26,32 @@ class Controller {
         return new $model();
     }
 
+    /**
+     * Ghi nhận audit log có cấu trúc vào database và đồng bộ file log
+     */
+    protected function logAudit($eventType, $targetType = null, $targetId = null, $metadata = [], $actorUserId = null) {
+        if ($actorUserId === null) {
+            $actorUserId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+        }
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        try {
+            $auditModel = $this->model('AuditLog');
+            $auditModel->recordEvent($eventType, $actorUserId, $targetType, $targetId, $ip, $metadata);
+        } catch (Throwable $e) {
+            error_log('[Controller::logAudit] Error recording audit log: ' . $e->getMessage());
+        }
+
+        if (function_exists('app_log')) {
+            $logLevel = (strpos($eventType, 'failed') !== false || strpos($eventType, 'blocked') !== false) ? 'warning' : 'info';
+            app_log($logLevel, $eventType, array_merge([
+                'actor_user_id' => $actorUserId,
+                'target_type'   => $targetType,
+                'target_id'     => $targetId
+            ], $metadata));
+        }
+    }
+
     protected function getPublicSettings() {
         if (self::$publicSettingsCache !== null) {
             return self::$publicSettingsCache;
